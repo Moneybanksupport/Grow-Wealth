@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow Money - User Dashboard</title>
+    <style>
+        :root {
+            --primary: #28a745;
+            --secondary: #218838;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: var(--dark);
+        }
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo span {
+            color: var(--dark);
+        }
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            color: var(--danger);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .card-primary {
+            border-top: 4px solid var(--primary);
+        }
+        .card-warning {
+            border-top: 4px solid var(--warning);
+        }
+        .card-info {
+            border-top: 4px solid var(--info);
+        }
+        .card-title {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .card-growth {
+            font-size: 12px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        .card-growth.danger {
+            color: var(--danger);
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .btn {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .crypto-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 500;
+        }
+        .wallet-address {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 20px 0;
+        }
+        .copy-btn {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="user.html" class="logo">Grow<span>Money</span></a>
+        <div class="user-menu">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 class="page-title">Dashboard</h1>
+            <div class="card-growth">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                </svg>
+                <span>2.5% Daily Profit</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="card card-primary">
+                <div class="card-title">Total Balance</div>
+                <div class="card-value" id="totalBalance">$0.00</div>
+                <div class="card-growth">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                    </svg>
+                    <span>Growing daily</span>
+                </div>
+            </div>
+            <div class="card card-warning">
+                <div class="card-title">Active Deposits</div>
+                <div class="card-value" id="activeDeposits">0</div>
+                <div class="card-growth">
+                    <span>Earning profit</span>
+                </div>
+            </div>
+            <div class="card card-info">
+                <div class="card-title">Total Profit</div>
+                <div class="card-value" id="totalProfit">$0.00</div>
+                <div class="card-growth">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/>
+                    </svg>
+                    <span>From investments</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('deposit-tab')">Deposit</div>
+            <div class="tab" onclick="openTab('withdraw-tab')">Withdraw</div>
+            <div class="tab" onclick="openTab('history-tab')">History</div>
+            <div class="tab" onclick="openTab('profile-tab')">Profile</div>
+        </div>
+
+        <!-- Deposit Tab -->
+        <div id="deposit-tab" class="tab-content active">
+            <h2>Make a Deposit</h2>
+            <p>Choose cryptocurrency to deposit and start earning 2.5% daily profit</p>
+            
+            <div class="form-group">
+                <label class="form-label">Select Cryptocurrency</label>
+                <select class="form-control" id="deposit-crypto">
+                    <option value="usdt">USDT (Tether)</option>
+                    <option value="btc">BTC (Bitcoin)</option>
+                    <option value="trx">TRX (TRON)</option>
+                    <option value="sol">SOL (Solana)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-control" id="deposit-amount" placeholder="Enter amount">
+            </div>
+            
+            <div class="wallet-address">
+                <strong>Wallet Address:</strong> 
+                <span id="wallet-address">12345678</span>
+                <button class="copy-btn" onclick="copyWalletAddress()">Copy</button>
+            </div>
+            
+            <button class="btn btn-block" onclick="submitDeposit()">Submit Deposit Request</button>
+            
+            <h3 style="margin-top: 30px;">Recent Deposits</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Crypto</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="deposit-history">
+                    <!-- Filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Withdraw Tab -->
+        <div id="withdraw-tab" class="tab-content">
+            <h2>Request Withdrawal</h2>
+            <p>Withdraw your funds to your wallet address</p>
+            
+            <div class="form-group">
+                <label class="form-label">Select Cryptocurrency</label>
+                <select class="form-control" id="withdraw-crypto">
+                    <option value="usdt">USDT (Tether)</option>
+                    <option value="btc">BTC (Bitcoin)</option>
+                    <option value="trx">TRX (TRON)</option>
+                    <option value="sol">SOL (Solana)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" class="form-control" id="withdraw-amount" placeholder="Enter amount">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Wallet Address</label>
+                <input type="text" class="form-control" id="withdraw-address" placeholder="Enter your wallet address">
+            </div>
+            
+            <button class="btn btn-block" onclick="submitWithdrawal()">Request Withdrawal</button>
+            
+            <h3 style="margin-top: 30px;">Recent Withdrawals</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Crypto</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="withdrawal-history">
+                    <!-- Filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history-tab" class="tab-content">
+            <h2>Transaction History</h2>
+            <p>All your deposit, withdrawal and profit transactions</p>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Crypto</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-history">
+                    <!-- Filled by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content">
+            <h2>My Profile</h2>
+            
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="profile-email" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Account Created</label>
+                <input type="text" class="form-control" id="profile-created" readonly>
+            </div>
+            
+            <h3>Change Password</h3>
+            <div class="form-group">
+                <label class="form-label">Current Password</label>
+                <input type="password" class="form-control" id="current-password">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" class="form-control" id="new-password">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" class="form-control" id="confirm-password">
+            </div>
+            
+            <button class="btn" onclick="changePassword()">Update Password</button>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+        // Initialize user data
+        const currentUser = JSON.parse(localStorage.getItem('grow-money-current-user'));
+        if(!currentUser) window.location.href = 'index.html';
+        
+        // Initialize UI
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set user avatar
+            document.getElementById('userAvatar').textContent = currentUser.email.charAt(0).toUpperCase();
+            
+            // Load user data
+            loadUserData();
+            loadDepositHistory();
+            loadWithdrawalHistory();
+            loadTransactionHistory();
+            loadProfileData();
+            
+            // Start profit calculation timer (simulated)
+            setInterval(calculateDailyProfit, 1000 * 60 * 60 * 24); // 24 hours
+        });
+        
+        // Load user data
+        function loadUserData() {
+            const users = JSON.parse(localStorage.getItem('grow-money-users'));
+            const user = users.find(u => u.id === currentUser.id);
+            
+            if(user) {
+                document.getElementById('totalBalance').textContent = `$${user.balance.toFixed(2)}`;
+                
+                const activeDeposits = user.deposits.filter(d => d.status === 'approved').length;
+                document.getElementById('activeDeposits').textContent = activeDeposits;
+                
+                const totalProfit = user.profitHistory.reduce((sum, profit) => sum + profit.amount, 0);
+                document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(2)}`;
+            }
+        }
+        
+        // Load deposit history
+        function loadDepositHistory() {
+            const tbody = document.getElementById('deposit-history');
+            tbody.innerHTML = '';
+            
+            currentUser.deposits.slice(0, 5).forEach(deposit => {
+                const row = document.createElement('tr');
+                
+                const dateCell = document.createElement('td');
+                dateCell.textContent = new Date(deposit.date).toLocaleString();
+                
+                const cryptoCell = document.createElement('td');
+                cryptoCell.innerHTML = `<span class="crypto-badge">${deposit.crypto.toUpperCase()}</span>`;
+                
+                const amountCell = document.createElement('td');
+                amountCell.textContent = deposit.amount;
+                
+                const statusCell = document.createElement('td');
+                const statusBadge = document.createElement('span');
+                statusBadge.className = `status-badge status-${deposit.status}`;
+                statusBadge.textContent = deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1);
+                statusCell.appendChild(statusBadge);
+                
+                row.appendChild(dateCell);
+                row.appendChild(cryptoCell);
+                row.appendChild(amountCell);
+                row.appendChild(statusCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Submit deposit
+        function submitDeposit() {
+            const crypto = document.getElementById('deposit-crypto').value;
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            
+            if(!crypto || !amount || amount <= 0) {
+                alert('Please enter valid amount');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('grow-money-users'));
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            
+            const newDeposit = {
+                id: Date.now(),
+                crypto,
+                amount,
+                date: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            users[userIndex].deposits.unshift(newDeposit);
+            localStorage.setItem('grow-money-users', JSON.stringify(users));
+            
+            // Update current user
+            const updatedUser = users[userIndex];
+            localStorage.setItem('grow-money-current-user', JSON.stringify(updatedUser));
+            
+            alert('Deposit request submitted successfully! Waiting for admin approval.');
+            loadDepositHistory();
+            document.getElementById('deposit-amount').value = '';
+        }
+        
+        // Logout
+        function logout() {
+            localStorage.removeItem('grow-money-current-user');
+            window.location.href = 'index.html';
+        }
+        
+        // Calculate daily profit (simulated)
+        function calculateDailyProfit() {
+            const users = JSON.parse(localStorage.getItem('grow-money-users'));
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            const user = users[userIndex];
+            
+            // Calculate profit only on approved deposits
+            const activeDeposits = user.deposits.filter(d => d.status === 'approved');
+            const totalDeposits = activeDeposits.reduce((sum, deposit) => sum + deposit.amount, 0);
+            
+            if(totalDeposits > 0) {
+                const profitAmount = totalDeposits * (2.5 / 100);
+                user.balance += profitAmount;
+                
+                user.profitHistory.push({
+                    date: new Date().toISOString(),
+                    amount: profitAmount,
+                    from: 'daily_profit'
+                });
+                
+                localStorage.setItem('grow-money-users', JSON.stringify(users));
+                localStorage.setItem('grow-money-current-user', JSON.stringify(user));
+                
+                loadUserData();
+                loadTransactionHistory();
+            }
+        }
+        
+        // Tab navigation
+        function openTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+        
+        // Copy wallet address
+        function copyWalletAddress() {
+            const address = document.getElementById('wallet-address').textContent;
+            navigator.clipboard.writeText(address);
+            alert('Wallet address copied to clipboard!');
+        }
+        
+        // Note: Similar functions needed for withdrawal, transaction history, profile, etc.
+        // These would follow the same pattern as the deposit functions above.
+    </script>
+</body>
+</html>
